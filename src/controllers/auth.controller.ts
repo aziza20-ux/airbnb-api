@@ -123,7 +123,7 @@ export const getMe = async (req:AuthRequest,res:Response):Promise<void>=>{
         includeoptions ={
             bookings:{
                 include:{
-                    listings:true
+                        listing:true
                 }
             }
         }
