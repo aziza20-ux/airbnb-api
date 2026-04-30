@@ -1,7 +1,6 @@
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import type { Express } from "express";
-import { url } from "node:inspector";
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -14,7 +13,7 @@ const options: swaggerJsdoc.Options = {
     servers: [
 
       {
-        url:"https://airbnb-api-vzuk.onrender.com/api-docs/",
+        url: "https://airbnb-api-vzuk.onrender.com/api/v1",
         description:"Production Server"
       },
       {
