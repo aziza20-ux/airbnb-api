@@ -65,7 +65,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
 };
 
 export const getUserById = async (req: Request, res: Response):Promise<void> => {
-    const id = req.params.id;
+    const id = String(req.params.id);
     const user = await prisma.user.findUnique({
         where: {id},
         include:{
@@ -110,7 +110,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
 };
 
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
-    const id = req.params.id;
+    const id = String(req.params.id);
     const existing = await prisma.user.findFirst({where:{id}});
 
     if (!existing) {
@@ -132,7 +132,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
 };
 
 export const deleteUser =  async (req: Request, res: Response): Promise<void> => {
-    const id = req.params.id;
+    const id = String(req.params.id);
     const deletedUser = await prisma.user.delete({where:{id}});
 
     clearUsersStatsCache();
@@ -141,7 +141,7 @@ export const deleteUser =  async (req: Request, res: Response): Promise<void> =>
 };
 
 export const getListingsByHost = async (req: Request, res: Response): Promise<void> => {
-    const id = req.params.id;
+    const id = String(req.params.id);
 
     const page = parsePositiveInteger(req.query.page, "page", 1);
     const limit = parsePositiveInteger(req.query.limit, "limit", 10);
@@ -170,7 +170,7 @@ export const getListingsByHost = async (req: Request, res: Response): Promise<vo
 };
 
 export const getBookingsByGuest = async (req: Request, res: Response): Promise<void> => {
-    const id = req.params.id;
+    const id = String(req.params.id);
 
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {

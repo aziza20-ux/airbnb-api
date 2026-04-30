@@ -62,7 +62,7 @@ export const getBookingById = async (req: Request, res: Response): Promise<void>
 	const id = req.params.id as string;
 
 	const booking = await prisma.booking.findUnique({
-		where: { id },
+		where: { id: String(id) },
 		include: {
 			guest: true,
 			listing: true,
@@ -90,8 +90,8 @@ export const createBooking = async (req: Request, res: Response): Promise<void> 
 	}
 
 	const [guest, listing] = await Promise.all([
-		prisma.user.findUnique({ where: { id: userId } }),
-		prisma.listing.findUnique({ where: { id: listingId } }),
+		prisma.user.findUnique({ where: { id: String(userId) } }),
+		prisma.listing.findUnique({ where: { id: String(listingId) } }),
 	]);
 
 	if (!guest) {
@@ -127,7 +127,7 @@ export const createBooking = async (req: Request, res: Response): Promise<void> 
 	const newBooking = await prisma.$transaction(async (tx) => {
 		const conflict = await tx.booking.findFirst({
 			where: {
-				listingId: listingId,
+				listingId: String(listingId),
 				status: BookingStatus.CONFIRMED,
 				checkIn: { lt: checkOutDate },
 				checkOut: { gt: checkInDate },
@@ -140,8 +140,8 @@ export const createBooking = async (req: Request, res: Response): Promise<void> 
 
 		return tx.booking.create({
 			data: {
-				guestId: userId,
-				listingId: listingId,
+				guestId: String(userId),
+				listingId: String(listingId),
 				checkIn: checkInDate,
 				checkOut: checkOutDate,
 				totalPrice,
@@ -155,13 +155,13 @@ export const createBooking = async (req: Request, res: Response): Promise<void> 
 
 export const deleteBooking = async (req: Request, res: Response): Promise<void> => {
 	const id = req.params.id;
-	const existing = await prisma.booking.findUnique({ where: { id } });
+	const existing = await prisma.booking.findUnique({ where: { id: String(id) } });
 
 	if (!existing) {
 		throw new AppError(404, "Booking not found");
 	}
 
-	await prisma.booking.delete({ where: { id } });
+	await prisma.booking.delete({ where: { id: String(id) } });
 
 	res.status(200).json({ message: "Booking deleted successfully" });
 };
@@ -174,13 +174,13 @@ export const updateBookingStatus = async (req: Request, res: Response): Promise<
 		throw new AppError(400, "Invalid booking status");
 	}
 
-	const existing = await prisma.booking.findFirst({ where: { id } });
+	const existing = await prisma.booking.findFirst({ where: { id: String(id) } });
 	if (!existing) {
 		throw new AppError(404, "Booking not found");
 	}
 
 	const updatedBooking = await prisma.booking.update({
-		where: { id },
+		where: { id: String(id) },
 		data: {
 			status: status as typeof BookingStatus[keyof typeof BookingStatus],
 		},

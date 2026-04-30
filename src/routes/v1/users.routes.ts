@@ -22,8 +22,9 @@ import { register,login } from "../../controllers/auth.controller";
  *          type: object
  *          properties:
  *              id:
- *                type: integer
- *                example: 1
+ *                type: string
+ *                format: uuid
+ *                example: 550e8400-e29b-41d4-a716-446655440000
  *              name:
  *                type: string
  *                example: aziza
@@ -62,7 +63,7 @@ const usersRoutes = Router();
 
 /**
  * @swagger
- * /api/users:
+ * /users:
  *   get:
  *     summary: Get all users
  *     description: Returns a list of all registered users. Requires authentication.
@@ -86,7 +87,7 @@ usersRoutes.get("/", asyncHandler("users.getAllUsers", getAllUsers));
 
 /**
  * @swagger
- * /api/users/stats:
+ * /users/stats:
  *   get:
  *     summary: Get user statistics
  *     tags: [Users]
@@ -109,7 +110,8 @@ usersRoutes.get("/:id/listings", asyncHandler("users.getListingsByHost", getList
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
  *         description: The user ID
  *       - in: query
  *         name: page
@@ -142,7 +144,8 @@ usersRoutes.get("/:id/bookings", asyncHandler("users.getBookingsByGuest", getBoo
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
  *         description: The user ID
  *     responses:
  *       200:
@@ -195,7 +198,8 @@ usersRoutes.post("/", asyncHandler("users.createUser", createUser));
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
  *     requestBody:
  *       content:
  *         application/json:

@@ -19,8 +19,9 @@ import {
  *       type: object
  *       properties:
  *         id:
- *           type: integer
- *           example: 1
+ *           type: string
+ *           format: uuid
+ *           example: 550e8400-e29b-41d4-a716-446655440000
  *         title:
  *           type: string
  *           example: Cozy cabin retreat
@@ -50,8 +51,9 @@ import {
  *           nullable: true
  *           example: 4.8
  *         userId:
- *           type: integer
- *           example: 12
+ *           type: string
+ *           format: uuid
+ *           example: 550e8400-e29b-41d4-a716-446655440001
  *         host:
  *           $ref: '#/components/schemas/User'
  *         createdAt:
@@ -152,7 +154,7 @@ const listingsRoutes = Router();
 
 /**
  * @swagger
- * /api/listings:
+ * /listings:
  *   get:
  *     summary: Get paginated listings
  *     tags: [Listings]
@@ -179,7 +181,7 @@ listingsRoutes.get("/", asyncHandler("listings.getAllListings", getAllListings))
 
 /**
  * @swagger
- * /api/listings/search:
+ * /listings/search:
  *   get:
  *     summary: Search and filter listings
  *     tags: [Listings]
@@ -227,7 +229,7 @@ listingsRoutes.get("/search", asyncHandler("listings.searchListings", searchList
 
 /**
  * @swagger
- * /api/listings/stats:
+ * /listings/stats:
  *   get:
  *     summary: Get listing statistics
  *     tags: [Listings]
@@ -243,7 +245,7 @@ listingsRoutes.get("/stats", asyncHandler("listings.listingStats", listingStats)
 
 /**
  * @swagger
- * /api/listings:
+ * /listings:
  *   post:
  *     summary: Create a listing
  *     description: Creates a new listing.
@@ -280,7 +282,7 @@ listingsRoutes.post("/", autheticate,requireHost, asyncHandler("listings.createL
 
 /**
  * @swagger
- * /api/listings/{id}:
+ * /listings/{id}:
  *   put:
  *     summary: Update a listing
  *     tags: [Listings]
@@ -291,9 +293,10 @@ listingsRoutes.post("/", autheticate,requireHost, asyncHandler("listings.createL
  *         name: id
  *         required: true
  *         description: The listing ID
- *         example: 1
+ *         example: 550e8400-e29b-41d4-a716-446655440002
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
  *     requestBody:
  *       required: true
  *       content:
@@ -324,7 +327,7 @@ listingsRoutes.put("/:id", autheticate,asyncHandler("listings.updateListing", up
 
 /**
  * @swagger
- * /api/listings/{id}:
+ * /listings/{id}:
  *   delete:
  *     summary: Delete a listing
  *     tags: [Listings]
@@ -335,9 +338,10 @@ listingsRoutes.put("/:id", autheticate,asyncHandler("listings.updateListing", up
  *         name: id
  *         required: true
  *         description: The listing ID
- *         example: 1
+ *         example: 550e8400-e29b-41d4-a716-446655440002
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
  *     responses:
  *       200:
  *         description: Listing deleted successfully
@@ -354,7 +358,7 @@ listingsRoutes.delete("/:id", autheticate,asyncHandler("listings.deleteListing",
 
 /**
  * @swagger
- * /api/listings/search:
+ * /listings/search:
  *   get:
  *     summary: Search listings
  *     tags: [Listings]

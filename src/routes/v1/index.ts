@@ -9,9 +9,9 @@ import uploadRoutes from "./upload.routes.js"
 const v1Router = Router();
 
 v1Router.use("/auth",authRoutes)
-v1Router.use("/api/users", usersRoutes);
-v1Router.use("/users", uploadRoutes);
-v1Router.use("/api/listings", listingsRoutes);
-v1Router.use("/api/bookings", bookingsRoutes);
+v1Router.use("/users", usersRoutes);
+v1Router.use("/usersuploads", uploadRoutes);
+v1Router.use("/listings", listingsRoutes);
+v1Router.use("/bookings", bookingsRoutes);
 
 export default v1Router;

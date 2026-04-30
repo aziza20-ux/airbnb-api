@@ -17,8 +17,9 @@ import {
  *       type: object
  *       properties:
  *         id:
- *           type: integer
- *           example: 101
+ *           type: string
+ *           format: uuid
+ *           example: 550e8400-e29b-41d4-a716-446655440100
  *         checkIn:
  *           type: string
  *           format: date-time
@@ -37,11 +38,13 @@ import {
  *           type: integer
  *           example: 2
  *         userId:
- *           type: integer
- *           example: 12
+ *           type: string
+ *           format: uuid
+ *           example: 550e8400-e29b-41d4-a716-446655440101
  *         listingId:
- *           type: integer
- *           example: 34
+ *           type: string
+ *           format: uuid
+ *           example: 550e8400-e29b-41d4-a716-446655440102
  *         user:
  *           $ref: '#/components/schemas/User'
  *         listing:
@@ -59,11 +62,13 @@ import {
  *         - checkOut
  *       properties:
  *         listingId:
- *           type: integer
- *           example: 34
+ *           type: string
+ *           format: uuid
+ *           example: 550e8400-e29b-41d4-a716-446655440102
  *         userId:
- *           type: integer
- *           example: 12
+ *           type: string
+ *           format: uuid
+ *           example: 550e8400-e29b-41d4-a716-446655440101
  *         checkIn:
  *           type: string
  *           format: date-time
@@ -99,7 +104,7 @@ const bookingsRoutes = Router();
 
 /**
  * @swagger
- * /api/bookings:
+ * /bookings:
  *   get:
  *     summary: Get all bookings
  *     tags: [Bookings]
@@ -128,7 +133,7 @@ bookingsRoutes.get("/", asyncHandler("bookings.getAllBookings", getAllBookings))
 
 /**
  * @swagger
- * /api/bookings/{id}:
+ * /bookings/{id}:
  *   get:
  *     summary: Get a booking by ID
  *     tags: [Bookings]
@@ -140,7 +145,8 @@ bookingsRoutes.get("/", asyncHandler("bookings.getAllBookings", getAllBookings))
  *         required: true
  *         description: The booking ID
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
  *     responses:
  *       200:
  *         description: Booking retrieved successfully with user and listing
@@ -161,7 +167,7 @@ bookingsRoutes.get("/:id", asyncHandler("bookings.getBookingById", getBookingByI
 
 /**
  * @swagger
- * /api/bookings:
+ * /bookings:
  *   post:
  *     summary: Create a booking
  *     description: Creates a new booking. The total is auto-calculated from pricePerNight × nights.
@@ -200,7 +206,7 @@ bookingsRoutes.post("/", autheticate, requireGuest, asyncHandler("bookings.creat
 
 /**
  * @swagger
- * /api/bookings/{id}/status:
+ * /bookings/{id}/status:
  *   patch:
  *     summary: Update booking status
  *     tags: [Bookings]
@@ -210,7 +216,8 @@ bookingsRoutes.post("/", autheticate, requireGuest, asyncHandler("bookings.creat
  *         required: true
  *         description: The booking ID
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
  *     requestBody:
  *       required: true
  *       content:
@@ -233,7 +240,7 @@ bookingsRoutes.patch("/:id/status", asyncHandler("bookings.updateBookingStatus",
 
 /**
  * @swagger
- * /api/bookings/{id}:
+ * /bookings/{id}:
  *   delete:
  *     summary: Cancel a booking
  *     tags: [Bookings]
@@ -245,7 +252,8 @@ bookingsRoutes.patch("/:id/status", asyncHandler("bookings.updateBookingStatus",
  *         required: true
  *         description: The booking ID
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
  *     responses:
  *       200:
  *         description: Booking deleted successfully

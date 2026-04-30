@@ -12,9 +12,17 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: "http://localhost:3000",
+        url: "http://localhost:3000/api/v1",
         description: "Development server",
       },
+    ],
+    tags: [
+      { name: "Health", description: "Service health endpoints" },
+      { name: "Auth", description: "Authentication endpoints" },
+      { name: "Users", description: "User management endpoints" },
+      { name: "Listings", description: "Listing management endpoints" },
+      { name: "Bookings", description: "Booking management endpoints" },
+      { name: "Uploads", description: "File upload endpoints" },
     ],
     components: {
       // Define the Bearer token security scheme
@@ -31,7 +39,7 @@ const options: swaggerJsdoc.Options = {
   },
   // Tell swagger-jsdoc where to find the JSDoc comments
   // It scans these files for @swagger annotations
-  apis: ["./src/routes/*.ts"],
+  apis: ["./src/routes/v1/*.ts", "./src/index.ts"],
 };
 
 const swaggerSpec = swaggerJsdoc(options);

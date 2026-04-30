@@ -212,7 +212,7 @@ export const searchListings = async (req: Request, res: Response): Promise<void>
 export const getListingById = async (req: Request, res: Response): Promise<void> => {
 	const id = req.params.id as string;
 	const listing = await prisma.listing.findUnique({
-		where: { id },
+		where: { id: String(id) },
 		include: {
 			host: true,
 			bookings: true,
@@ -249,7 +249,7 @@ export const createListing = async (req:AuthRequest, res: Response): Promise<voi
 		throw new AppError(400, "Missing required fields");
 	}
 
-	const host = await prisma.user.findUnique({ where: { id: req.userId } });
+	const host = await prisma.user.findUnique({ where: { id: String(req.userId) } });
 	if (!host) {
 		throw new AppError(404, "Host not found");
 	}
@@ -263,7 +263,7 @@ export const createListing = async (req:AuthRequest, res: Response): Promise<voi
 			guests: Number(guests),
 			type,
 			amenities,
-			hostId: req.userId,
+			hostId: String(req.userId),
 		},
 	});
 
@@ -274,7 +274,7 @@ export const createListing = async (req:AuthRequest, res: Response): Promise<voi
 
 export const updateListing = async (req: AuthRequest, res: Response): Promise<void> => {
 	const id = req.params.id as string;
-	const existing = await prisma.listing.findFirst({ where: { id } });
+	const existing = await prisma.listing.findFirst({ where: { id: String(id) } });
 
 	if (!existing) {
 		throw new AppError(404, "Listing not found");
@@ -306,7 +306,7 @@ export const updateListing = async (req: AuthRequest, res: Response): Promise<vo
 	if (rating !== undefined) data.rating = rating === null ? null : Number(rating);
 
 	const updatedListing = await prisma.listing.update({
-		where: { id },
+		where: { id: String(id) },
 		data,
 	});
 
@@ -317,7 +317,7 @@ export const updateListing = async (req: AuthRequest, res: Response): Promise<vo
 
 export const deleteListing = async (req: AuthRequest, res: Response): Promise<void> => {
 	const id = req.params.id as string;
-	const existing = await prisma.listing.findFirst({ where: { id } });
+	const existing = await prisma.listing.findFirst({ where: { id: String(id) } });
 
 	if (!existing) {
 		throw new AppError(404, "Listing not found");
@@ -328,7 +328,7 @@ export const deleteListing = async (req: AuthRequest, res: Response): Promise<vo
 		return;
 	}
 
-	const deletedListing = await prisma.listing.delete({ where: { id } });
+	const deletedListing = await prisma.listing.delete({ where: { id: String(id) } });
 	clearListingStatsCache();
 	res.status(200).json(deletedListing);
 };
