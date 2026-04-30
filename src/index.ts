@@ -24,7 +24,7 @@ app.use(requestlimit);  // apply to all routes
 
 app.use(compression());  // compress all responses
 
-app.get("/health", (req: Request, res: Response) => {
+app.get("/api/v1/health", (req: Request, res: Response) => {
   res.json({ status: "ok", uptime: process.uptime(), timestamp: new Date() });
 });
 
