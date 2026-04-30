@@ -56,16 +56,16 @@ export const register = async (req:Request,res:Response):Promise<void> =>{
         const {password:_, ...userWithoutPassword} =  newuser
         res.status(201).json({status:'success', userWithoutPassword})
         
-        // try{
-        //     await sendEmail(
-        //         email,
-        //         "Welcome to Airbnb",
-        //         welcomeEmail(name,role)
-        //     );
-        // }catch(error){
-        //     console.log("Email send error:", error)
-        // }
-        // return;
+        try{
+            await sendEmail(
+                email,
+                "Welcome to Airbnb",
+                welcomeEmail(name,role)
+            );
+        }catch(error){
+            console.log("Email send error:", error)
+        }
+        return;
     }catch(error:any){
         if(error.code === 'P2002'){
             const field = error.meta?.target?.[0] || 'field'
