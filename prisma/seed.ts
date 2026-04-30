@@ -26,7 +26,7 @@ async function main() {
       name: "Admin User",
       email: "admin@airbnb.com",
       username: "admin",
-      phone: "079",
+      phone: "0791168562",
       password: await bcrypt.hash("Admin@123", 10),
       role: "ADMIN",
     },

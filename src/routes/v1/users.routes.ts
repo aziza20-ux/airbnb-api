@@ -13,6 +13,7 @@ import {
 } from "../../controllers/users.controller";
 
 import { register,login } from "../../controllers/auth.controller";
+import { requireAdmin } from "../../middlewares/auth.middleware";
 
 /**
  * @swagger
@@ -83,7 +84,7 @@ const usersRoutes = Router();
  *         description: No token provided or token is invalid
  */
 
-usersRoutes.get("/", asyncHandler("users.getAllUsers", getAllUsers));
+usersRoutes.get("/", requireAdmin,asyncHandler("users.getAllUsers", getAllUsers));
 
 /**
  * @swagger
@@ -237,7 +238,7 @@ usersRoutes.put("/:id", asyncHandler("users.updateUser", updateUser));
  *       401:
  *         description: Unauthorized
  */
-usersRoutes.delete("/:id", asyncHandler("users.deleteUser", deleteUser));
+usersRoutes.delete("/:id", requireAdmin,asyncHandler("users.deleteUser", deleteUser));
 
 export default usersRoutes;
 
