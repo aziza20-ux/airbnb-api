@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { BookingStatus } from "../generated/prisma/client";
+import { BookingStatus, Prisma } from "../generated/prisma/client";
 import prisma from "../config/prisma";
 import { AppError } from "../utils/app-error";
 
@@ -124,7 +124,7 @@ export const createBooking = async (req: Request, res: Response): Promise<void> 
 	const nights = (checkOutDate.getTime() - checkInDate.getTime()) / MS_PER_DAY;
 	const totalPrice = nights * listing.pricePerNight;
 
-	const newBooking = await prisma.$transaction(async (tx) => {
+	const newBooking = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
 		const conflict = await tx.booking.findFirst({
 			where: {
 				listingId: String(listingId),

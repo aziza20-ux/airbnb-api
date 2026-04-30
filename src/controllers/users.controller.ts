@@ -230,7 +230,7 @@ export const usersStats = async (req: Request, res: Response): Promise<void> => 
 
     const responseData: UsersStatsResponse = {
         totalUsers,
-        byRole: roleGroups.reduce<Record<string, number>>((accumulator, group) => {
+        byRole: roleGroups.reduce<Record<string, number>>((accumulator: Record<string, number>, group: { role: string; _count: { role: number } }) => {
             accumulator[group.role] = group._count.role;
             return accumulator;
         }, {}),

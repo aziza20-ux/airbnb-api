@@ -365,11 +365,11 @@ export const listingStats = async (req:Request,res:Response):Promise<void>=>{
 	const responseData: ListingStatsResponse = {
 		totalListings,
 		averagePrice: averagePriceResult._avg.pricePerNight ?? 0,
-		byLocation: locationGroups.reduce<Record<string, number>>((accumulator, group) => {
+		byLocation: locationGroups.reduce<Record<string, number>>((accumulator: Record<string, number>, group: { location: string; _count: { location: number } }) => {
 			accumulator[group.location] = group._count.location;
 			return accumulator;
 		}, {}),
-		byType: typeGroups.reduce<Record<string, number>>((accumulator, group) => {
+		byType: typeGroups.reduce<Record<string, number>>((accumulator: Record<string, number>, group: { type: string; _count: { type: number } }) => {
 			accumulator[group.type] = group._count.type;
 			return accumulator;
 		}, {}),

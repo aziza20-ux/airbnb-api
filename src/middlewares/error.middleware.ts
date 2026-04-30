@@ -7,31 +7,33 @@ type ErrorWithOperation = Error & { operation?: string };
 export function globalErrorHandler(err: unknown, req: Request, res: Response, next: NextFunction): void {
   void next;
 
+  const error = err instanceof Error ? err : new Error(String(err));
+
   const operation =
-    err instanceof Error && "operation" in err && typeof (err as ErrorWithOperation).operation === "string"
-      ? (err as ErrorWithOperation).operation
+    error instanceof Error && "operation" in error && typeof (error as ErrorWithOperation).operation === "string"
+      ? (error as ErrorWithOperation).operation
       : `${req.method} ${req.originalUrl}`;
 
-  const message = err instanceof Error ? err.message : String(err);
+  const message = error.message;
 
-  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
     console.error("Request failed", {
       operation,
-      code: err.code,
+      code: error.code,
       message,
     });
 
-    if (err.code === "P2002") {
+    if (error.code === "P2002") {
       res.status(409).json({ message: "Resource already exists" });
       return;
     }
 
-    if (err.code === "P2025") {
+    if (error.code === "P2025") {
       res.status(404).json({ message: "Record not found" });
       return;
     }
 
-    if (err.code === "P2003") {
+    if (error.code === "P2003") {
       res.status(400).json({ message: "Invalid related record reference" });
       return;
     }
@@ -40,13 +42,13 @@ export function globalErrorHandler(err: unknown, req: Request, res: Response, ne
     return;
   }
 
-  if (err instanceof AppError) {
+  if (error instanceof AppError) {
     console.error("Request failed", {
       operation,
       code: "APP_ERROR",
       message,
     });
-    res.status(err.statusCode).json({ message: err.message });
+    res.status(error.statusCode).json({ message: error.message });
     return;
   }
 
