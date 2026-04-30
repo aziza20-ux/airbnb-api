@@ -55,6 +55,8 @@ const swaggerSpec = swaggerJsdoc(options);
 export function setupSwagger(app: Express) {
   // Serve the interactive Swagger UI
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  // Also mount the same UI under the versioned API path for convenience
+  app.use("/api/v1/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
   // Also expose the raw OpenAPI JSON spec
   // Useful for importing into Postman or generating client SDKs
@@ -62,5 +64,10 @@ export function setupSwagger(app: Express) {
     res.json(swaggerSpec);
   });
 
-  console.log("Swagger docs available at http://localhost:3000/api-docs");
+  // Expose the same JSON under the versioned docs path
+  app.get("/api/v1/docs.json", (req, res) => {
+    res.json(swaggerSpec);
+  });
+
+  console.log("Swagger docs available at http://localhost:3000/api-docs and http://localhost:3000/api/v1/docs");
 }
