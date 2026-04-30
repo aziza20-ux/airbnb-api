@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id       String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  username  String    @unique
+  phone     String
+  role      Role      @default(GUEST)
+  avatar    String?
+  bio       String?
+  resetToken  String?
+  resetTokenExpiry  DateTime?
+  password String?
+  avatarPublicId String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+  listings  Listing[]
+  bookings  Booking[]
+
+    @@index([name])
+    @@index([role])
+}
+
+model Booking {
+  id         String    @id @default(uuid())
+  checkIn    DateTime
+  checkOut   DateTime
+  totalPrice Float
+  status     BookingStatus @default(PENDING)
+  createdAt  DateTime      @default(now())
+  guest      User          @relation(fields: [guestId], references: [id])
+  guestId    String
+  listing    Listing       @relation(fields: [listingId], references: [id])
+  listingId  String
+  @@index([guestId])
+  @@index([listingId])
+  @@index([status])
+}
+
+model Listing {
+  id            String    @id @default(uuid())
+  title         String
+  description   String
+  location      String
+  pricePerNight Float
+  guests        Int
+  type          ListingType
+  amenities     String[]
+  rating        Float?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  host          User        @relation(fields: [hostId], references: [id])
+  hostId        String
+  bookings      Booking[]
+  photos        ListingPhoto[]
+
+  @@index([hostId])
+  @@index([location])
+  @@index([type])
+  @@index([pricePerNight])
+}
+
+enum ListingType {
+  APARTMENT
+  HOUSE
+  VILLA
+  CABIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum Role {
+  HOST
+  GUEST
+  ADMIN
+}
+
+model ListingPhoto {
+  id       String    @id @default(uuid())
+  url       String
+  publicId  String
+  listing   Listing @relation(fields: [listingId], references: [id])
+  listingId String
+}
