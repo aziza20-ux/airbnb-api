@@ -1,6 +1,7 @@
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import type { Express } from "express";
+import { url } from "node:inspector";
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -11,10 +12,16 @@ const options: swaggerJsdoc.Options = {
       description: "REST API for Airbnb listings,bookings users, and authentication",
     },
     servers: [
+
+      {
+        url:"https://airbnb-api-vzuk.onrender.com/api-docs/",
+        description:"Production Server"
+      },
       {
         url: "http://localhost:3000/api/v1",
         description: "Development server",
-      },
+      }
+
     ],
     tags: [
       { name: "Health", description: "Service health endpoints" },
