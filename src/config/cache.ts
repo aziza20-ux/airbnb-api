@@ -30,6 +30,14 @@ export const deleteCache = (key: string): void => {
 	cacheStore.delete(key);
 };
 
+export const deleteCacheByPrefix = (prefix: string): void => {
+	for (const key of cacheStore.keys()) {
+		if (key.startsWith(prefix)) {
+			cacheStore.delete(key);
+		}
+	}
+};
+
 export const clearCache = (): void => {
 	cacheStore.clear();
 };

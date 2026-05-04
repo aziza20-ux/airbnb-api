@@ -24,9 +24,7 @@ app.use(requestlimit);  // apply to all routes
 
 app.use(compression());  // compress all responses
 
-app.get("/api/v1/health", (req: Request, res: Response) => {
-  res.json({ status: "ok", uptime: process.uptime(), timestamp: new Date() });
-});
+
 
 /**
  * @swagger
@@ -53,6 +51,10 @@ app.get("/api/v1/health", (req: Request, res: Response) => {
  *                   format: date-time
  *                   example: 2026-04-30T12:00:00.000Z
  */
+
+app.get("/api/v1/health", (req: Request, res: Response) => {
+  res.json({ status: "ok", uptime: process.uptime(), timestamp: new Date() });
+});
 
 app.use("/api/v1", v1Router);
 app.use(globalErrorHandler);

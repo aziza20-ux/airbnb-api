@@ -10,6 +10,11 @@ import {
   deleteListing,
   listingStats,
 } from "../../controllers/listings.controller"
+import {
+  createListingReview,
+  getListingReviews,
+} from "../../controllers/review.controller";
+
 
 /**
  * @swagger
@@ -148,6 +153,71 @@ import {
  *           type: object
  *           additionalProperties:
  *             type: integer
+ *     ReviewUser:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *         avatar:
+ *           type: string
+ *           nullable: true
+ *     Review:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         rating:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 5
+ *         comment:
+ *           type: string
+ *         userId:
+ *           type: string
+ *           format: uuid
+ *         listingId:
+ *           type: string
+ *           format: uuid
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         user:
+ *           $ref: '#/components/schemas/ReviewUser'
+ *     CreateReviewInput:
+ *       type: object
+ *       required:
+ *         - userId
+ *         - rating
+ *         - comment
+ *       properties:
+ *         userId:
+ *           type: string
+ *           format: uuid
+ *         rating:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 5
+ *         comment:
+ *           type: string
+ *     PaginatedReviewsResponse:
+ *       type: object
+ *       properties:
+ *         data:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Review'
+ *         meta:
+ *           type: object
+ *           properties:
+ *             page:
+ *               type: integer
+ *             limit:
+ *               type: integer
+ *             total:
+ *               type: integer
+ *             totalPages:
+ *               type: integer
  */
 
 const listingsRoutes = Router();
@@ -207,8 +277,6 @@ listingsRoutes.get("/", asyncHandler("listings.getAllListings", getAllListings))
  *           enum: [apartment, house, villa, cabin]
  *       - in: query
  *         name: minPrice
- *         schema:
- *           type: number
  *       - in: query
  *         name: maxPrice
  *         schema:
@@ -291,7 +359,72 @@ listingsRoutes.post("/", autheticate,requireHost, asyncHandler("listings.createL
  *     parameters:
  *       - in: path
  *         name: id
+ * 
+ * @swagger
+ * /listings/{id}/reviews:
+ *   get:
+ *     summary: Get paginated reviews for a listing
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: id
  *         required: true
+ *         description: The listing ID
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *     responses:
+ *       200:
+ *         description: Paginated reviews retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedReviewsResponse'
+ *       404:
+ *         description: Listing not found
+ *   post:
+ *     summary: Create a review for a listing
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The listing ID
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateReviewInput'
+ *     responses:
+ *       201:
+ *         description: Review created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Review'
+ *       400:
+ *         description: Invalid review input (e.g., rating not between 1-5)
+ *       404:
+ *         description: Listing or user not found
+ */
+listingsRoutes.get("/:id/reviews", asyncHandler("reviews.getListingReviews", getListingReviews));
+listingsRoutes.post("/:id/reviews", asyncHandler("reviews.createListingReview", createListingReview));
+
+/**        required: true
  *         description: The listing ID
  *         example: 550e8400-e29b-41d4-a716-446655440002
  *         schema:

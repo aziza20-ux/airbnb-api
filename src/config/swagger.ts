@@ -28,6 +28,7 @@ const options: swaggerJsdoc.Options = {
       { name: "Users", description: "User management endpoints" },
       { name: "Listings", description: "Listing management endpoints" },
       { name: "Bookings", description: "Booking management endpoints" },
+      { name: "Reviews", description: "Review management endpoints" },
       { name: "Uploads", description: "File upload endpoints" },
     ],
     components: {

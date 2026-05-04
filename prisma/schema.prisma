@@ -30,6 +30,7 @@ model User {
   updatedAt DateTime @updatedAt @default(now())
   listings  Listing[]
   bookings  Booking[]
+  reviews   Review[]
 
     @@index([name])
     @@index([role])
@@ -66,6 +67,7 @@ model Listing {
   host          User        @relation(fields: [hostId], references: [id])
   hostId        String
   bookings      Booking[]
+  reviews        Review[]
   photos        ListingPhoto[]
 
   @@index([hostId])
@@ -99,4 +101,18 @@ model ListingPhoto {
   publicId  String
   listing   Listing @relation(fields: [listingId], references: [id])
   listingId String
+}
+
+model Review {
+  id       String    @id @default(uuid())
+  rating    Int
+  comment   String
+  userId    String
+  listingId String
+  user      User     @relation(fields: [userId], references: [id])
+  listing   Listing  @relation(fields: [listingId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([listingId])
 }
