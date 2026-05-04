@@ -128,14 +128,19 @@ export const createBooking = async (req: Request, res: Response): Promise<void> 
 		const conflict = await tx.booking.findFirst({
 			where: {
 				listingId: String(listingId),
-				status: BookingStatus.CONFIRMED,
+				status: {
+					in: [BookingStatus.CONFIRMED, BookingStatus.PENDING],
+				},
 				checkIn: { lt: checkOutDate },
 				checkOut: { gt: checkInDate },
 			},
 		});
 
 		if (conflict) {
-			throw new AppError(409, "Booking conflict");
+			throw new AppError(
+				409,
+				`Listing is already booked for selected dates (${conflict.checkIn.toLocaleDateString()} - ${conflict.checkOut.toLocaleDateString()})`
+			);
 		}
 
 		return tx.booking.create({

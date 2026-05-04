@@ -13,6 +13,7 @@ async function main() {
   // Clean existing data first — order matters because of foreign keys
   // Delete in reverse order of dependencies
   await prisma.booking.deleteMany();
+  await prisma.review.deleteMany();
   await prisma.listingPhoto.deleteMany();
   await prisma.listing.deleteMany();
   await prisma.user.deleteMany();

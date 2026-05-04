@@ -95,6 +95,9 @@ CLOUDINARY_NAME="your-cloudinary-name"
 CLOUDINARY_API_KEY="your-api-key"
 CLOUDINARY_API_SECRET="your-api-secret"
 
+# AI / Groq
+GROQ_API_KEY="your-groq-api-key"
+
 # Redis
 REDIS_URL="redis://localhost:6379"
 
@@ -336,6 +339,7 @@ Set the following in the Render dashboard:
 - `DATABASE_URL` - PostgreSQL connection string
 - `JWT_SECRET` - Secret key for JWT
 - `CLOUDINARY_*` - Cloudinary credentials
+- `GROQ_API_KEY` - Groq API key required for AI search, description generation, and chat
 - `REDIS_URL` - Redis connection string
 - `NODE_ENV` - Set to "production"
 
