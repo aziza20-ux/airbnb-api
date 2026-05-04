@@ -1,6 +1,6 @@
 # Airbnb API
 
-A REST API for Airbnb-like listing, booking, and user management built with Express.js, TypeScript, and Prisma ORM.
+A REST API for Airbnb-like listing, booking, user, and AI-assisted property management built with Express.js, TypeScript, and Prisma ORM.
 
 ## 🚀 Tech Stack
 
@@ -11,6 +11,7 @@ A REST API for Airbnb-like listing, booking, and user management built with Expr
 - **Authentication**: JWT (JSON Web Tokens)
 - **File Storage**: Cloudinary
 - **Caching**: Redis
+- **AI**: LangChain-powered LLM workflows for search, description generation, and chat
 - **Documentation**: Swagger/OpenAPI 3.0
 - **Development**: tsx, nodemon
 
@@ -21,6 +22,7 @@ A REST API for Airbnb-like listing, booking, and user management built with Expr
 - Listing management (create, read, update, delete listings)
 - Booking management with conflict detection
 - Photo uploads (user avatars and listing photos)
+- AI-powered listing search, description generation, and chat assistant
 - Rate limiting and request throttling
 - Swagger API documentation with interactive UI
 - Health check endpoint
@@ -44,6 +46,7 @@ src/
 │   ├── users.controller.ts
 │   ├── listings.controller.ts
 │   ├── bookings.controller.ts
+│   ├── ai.controllers.ts
 │   └── upload.controller.ts
 ├── middlewares/        # Express middlewares
 │   ├── auth.middleware.ts
@@ -55,6 +58,7 @@ src/
 │       ├── users.routes.ts
 │       ├── listings.routes.ts
 │       ├── bookings.routes.ts
+│       ├── ai.routes.ts
 │       ├── upload.routes.ts
 │       └── index.ts
 ├── templates/        # Email templates
@@ -206,6 +210,11 @@ Authorization: Bearer <your-jwt-token>
 - `PUT /api/v1/listings/{id}` - Update listing (HOST only)
 - `DELETE /api/v1/listings/{id}` - Delete listing (HOST only)
 
+#### AI
+- `POST /api/v1/ai/search` - Extract search filters from natural language and return matching listings
+- `POST /api/v1/ai/description` - Generate an Airbnb-style listing description
+- `POST /api/v1/ai/chat` - Chat with the Airbnb assistant using session-based conversation history
+
 #### Bookings
 - `GET /api/v1/bookings` - List all bookings
 - `POST /api/v1/bookings` - Create booking (GUEST only)
@@ -222,6 +231,43 @@ Authorization: Bearer <your-jwt-token>
 #### Health
 - `GET /api/v1/health` - Health check endpoint
 
+## 🤖 AI Features
+
+The API includes three AI-powered endpoints:
+
+- Natural language search that converts a plain-English query into listing filters
+- Listing description generation for hosts creating or improving properties
+- A chat assistant that answers listing and booking questions with short-term session memory
+
+### Example Requests
+
+#### Search
+```json
+{
+  "query": "Find a villa in Miami for 4 guests under 300 dollars"
+}
+```
+
+#### Description
+```json
+{
+  "title": "Sunset Villa",
+  "location": "Miami",
+  "type": "VILLA",
+  "guests": 4,
+  "amenities": ["Pool", "WiFi", "Kitchen"],
+  "pricePerNight": 280
+}
+```
+
+#### Chat
+```json
+{
+  "message": "Show me listings with a pool near the beach",
+  "sessionId": "session-123"
+}
+```
+
 ## 🗄️ Database Schema
 
 The database includes the following models:
@@ -230,6 +276,7 @@ The database includes the following models:
 - **Listing** - Property listings with details, amenities, and photos
 - **Booking** - Booking records with check-in/out dates and status
 - **ListingPhoto** - Photos associated with listings
+- **AI** - AI search, description, and chat flows backed by the app's listing data
 
 See `prisma/schema.prisma` for the complete schema.
 
