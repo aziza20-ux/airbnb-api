@@ -214,7 +214,14 @@ export const getListingById = async (req: Request, res: Response): Promise<void>
 	const listing = await prisma.listing.findUnique({
 		where: { id: String(id) },
 		include: {
-			host: true,
+			host: {
+				select: {
+					id: true,
+					name: true,
+					email: true,
+					avatar: true,
+				},
+			},
 			bookings: true,
 		},
 	});

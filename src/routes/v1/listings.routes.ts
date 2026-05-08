@@ -297,6 +297,32 @@ listingsRoutes.get("/search", asyncHandler("listings.searchListings", searchList
 
 /**
  * @swagger
+ * /listings/{id}:
+ *   get:
+ *     summary: Get a listing by ID
+ *     tags: [Listings]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The listing ID
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Listing retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Listing'
+ *       404:
+ *         description: Listing not found
+ */
+listingsRoutes.get("/:id", asyncHandler("listings.getListingById", getListingById));
+
+/**
+ * @swagger
  * /listings/stats:
  *   get:
  *     summary: Get listing statistics
