@@ -7,11 +7,15 @@ import { setupSwagger } from "./config/swagger.js";
 import { requestlimit } from "./middlewares/ratelimit.middleware";
 import morgan from "morgan";
 import v1Router from "./routes/v1/index.js";
+import cors from 'cors';
 
 
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
+
+
+app.use(cors());
 
 //morgan logger
 // dev format in development, combined format in production
