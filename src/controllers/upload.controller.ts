@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import prisma from "../config/prisma";
 import type { AuthRequest } from "../middlewares/auth.middleware";
 import { deleteFromCloudinary, uploadToCloudinary } from "../config/cloudinary";
+import { deleteCacheByPrefix } from "../config/cache";
 
 type UploadRequest = AuthRequest & {
 	file?: Express.Multer.File;
@@ -129,6 +130,8 @@ export const uploadListingPhotos = async (req: Request, res: Response): Promise<
 		orderBy: { id: "asc" },
 	});
 
+	deleteCacheByPrefix("listings:list:");
+
 	res.status(200).json({
 		status: "success",
 		listing: {
@@ -167,6 +170,7 @@ export const deleteListingPhoto = async (req: Request, res: Response): Promise<v
 
 	await deleteFromCloudinary(photo.publicId);
 	await prisma.listingPhoto.delete({ where: { id: String(photoId) } });
+	deleteCacheByPrefix("listings:list:");
 
 	res.status(200).json({ status: "success", message: "Listing photo deleted successfully" });
 };

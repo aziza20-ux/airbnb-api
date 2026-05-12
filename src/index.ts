@@ -23,7 +23,14 @@ app.use(process.env["NODE_ENV"] === "production" ? morgan("combined") : morgan("
 // Middleware
 app.use(express.json());
 setupSwagger(app);
-app.use(requestlimit);  // apply to all routes
+app.use((req: Request, res: Response, next: NextFunction) => {
+  if (req.method === "GET" && req.path.startsWith("/api/v1/listings")) {
+    next();
+    return;
+  }
+
+  requestlimit(req, res, next);
+});  // keep public listing reads out of the global limiter
 
 
 app.use(compression());  // compress all responses

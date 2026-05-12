@@ -3,7 +3,7 @@ import { ListingType, type Prisma } from "../generated/prisma/client";
 import prisma from "../config/prisma";
 import { AppError } from "../utils/app-error";
 import { autheticate,AuthRequest } from "../middlewares/auth.middleware";
-import { deleteCache, getCache, setCache } from "../config/cache";
+import { deleteCache, deleteCacheByPrefix, getCache, setCache } from "../config/cache";
 
 type ListingStatsResponse = {
 	totalListings: number;
@@ -19,6 +19,18 @@ type CachedListingStats = {
 
 const clearListingStatsCache = (): void => {
 	deleteCache("listings:stats");
+};
+
+const clearListingListCache = (): void => {
+	deleteCacheByPrefix("listings:list:");
+};
+
+const listingPhotoInclude = {
+	photos: {
+		orderBy: {
+			id: "asc" as const,
+		},
+	},
 };
 
 const parsePositiveInteger = (value: unknown, fieldName: string, defaultValue: number): number => {
@@ -108,7 +120,7 @@ export const getAllListings = async (req: Request, res: Response): Promise<void>
 	}
 
 	const cacheKey = `listings:list:${page}:${limit}:${String(locationQuery ?? "")}:${String(typeQuery ?? "")}:${String(maxPriceQuery ?? "")}`;
-	const cachedResponse = getCache<{ data: Prisma.ListingGetPayload<{ include: { host: { select: { name: true; avatar: true } } } }>[], meta: { page: number; limit: number; total: number; totalPages: number } }>(cacheKey);
+	const cachedResponse = getCache<{ data: Prisma.ListingGetPayload<{ include: { host: { select: { name: true; avatar: true } }, photos: { orderBy: { id: "asc" } } } }>[], meta: { page: number; limit: number; total: number; totalPages: number } }>(cacheKey);
 	if (cachedResponse) {
 		res.status(200).json(cachedResponse);
 		return;
@@ -152,10 +164,13 @@ export const getAllListings = async (req: Request, res: Response): Promise<void>
 			include: {
 				host: {
 					select: {
+						id: true,
 						name: true,
+						email: true,
 						avatar: true,
 					},
 				},
+				...listingPhotoInclude,
 			},
 		}),
 	]);
@@ -190,10 +205,13 @@ export const searchListings = async (req: Request, res: Response): Promise<void>
 			include: {
 				host: {
 					select: {
+						id: true,
 						name: true,
 						email: true,
+						avatar: true,
 					},
 				},
+				...listingPhotoInclude,
 			},
 		}),
 	]);
@@ -223,6 +241,7 @@ export const getListingById = async (req: Request, res: Response): Promise<void>
 				},
 			},
 			bookings: true,
+				...listingPhotoInclude,
 		},
 	});
 
@@ -272,22 +291,39 @@ export const createListing = async (req:AuthRequest, res: Response): Promise<voi
 			amenities,
 			hostId: String(req.userId),
 		},
+		include: {
+			host: {
+				select: {
+					id: true,
+					name: true,
+					email: true,
+					username: true,
+					phone: true,
+					role: true,
+					avatar: true,
+					bio: true,
+					createdAt: true,
+				},
+			},
+			...listingPhotoInclude,
+		},
 	});
 
 	clearListingStatsCache();
+	clearListingListCache();
 
 	res.status(201).json(newListing);
 };
 
 export const updateListing = async (req: AuthRequest, res: Response): Promise<void> => {
 	const id = req.params.id as string;
-	const existing = await prisma.listing.findFirst({ where: { id: String(id) } });
+	const existing = await prisma.listing.findFirst({ where: { id: id } });
 
 	if (!existing) {
 		throw new AppError(404, "Listing not found");
 
 	}
-	if (existing.hostId !== req.userId && req.role !== "ADMIN"){
+	if (existing.hostId !== req.userId || req.role !== "ADMIN"){
 		res.status(403).json({error:"You can only edit your own listings"})
 	}
 
@@ -315,28 +351,46 @@ export const updateListing = async (req: AuthRequest, res: Response): Promise<vo
 	const updatedListing = await prisma.listing.update({
 		where: { id: String(id) },
 		data,
+		include: {
+			host: {
+				select: {
+					id: true,
+					name: true,
+					email: true,
+					username: true,
+					phone: true,
+					role: true,
+					avatar: true,
+					bio: true,
+					createdAt: true,
+				},
+			},
+			...listingPhotoInclude,
+		},
 	});
 
 	clearListingStatsCache();
+	clearListingListCache();
 
 	res.status(200).json(updatedListing);
 };
 
 export const deleteListing = async (req: AuthRequest, res: Response): Promise<void> => {
 	const id = req.params.id as string;
-	const existing = await prisma.listing.findFirst({ where: { id: String(id) } });
+	const existing = await prisma.listing.findFirst({ where: { id: id } });
 
 	if (!existing) {
 		throw new AppError(404, "Listing not found");
 	}
 
-	if (existing.id !== req.userId || existing.id !== req.userId){
+	if (existing.hostId !== req.userId){
 		res.status(403).json({error:"forbidden access"})
 		return;
 	}
 
 	const deletedListing = await prisma.listing.delete({ where: { id: String(id) } });
 	clearListingStatsCache();
+	clearListingListCache();
 	res.status(200).json(deletedListing);
 };
 
