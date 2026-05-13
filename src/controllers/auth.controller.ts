@@ -145,8 +145,8 @@ export const getMe = async (req:AuthRequest,res:Response):Promise<void>=>{
 
 export const changePassword = async (req:AuthRequest,res:Response):Promise<void> =>{
     const {currentPassword,newPassword} = req.body;
-    if (!currentPassword&&!newPassword){
-        res.status(404).json({error:"please provide both current and new password"});
+    if (!currentPassword || !newPassword){
+        res.status(400).json({error:"please provide both current and new password"});
         return;
     }
     const id = req.userId
@@ -164,14 +164,14 @@ export const changePassword = async (req:AuthRequest,res:Response):Promise<void>
 
    const isMatch = await bcrypt.compare(currentPassword,user.password!)
    if (!isMatch){
-    res.status(404).json({
+     res.status(401).json({
        error:"Invalide credentials" 
     })
     return;
    }
  
    if ( newPassword.length < 8){
-    res.status(502).json({error:"password must be atleast 8 characters long"})
+     res.status(400).json({error:"password must be atleast 8 characters long"})
     return;
    }
    const hashedpassword =  await bcrypt.hash(newPassword,10)
@@ -204,7 +204,8 @@ export const forgotPassword = async (req:AuthRequest,res:Response):Promise<void>
         }
     })
 
-    const resetLink = `${process.env["API_URL"] || "http://localhost:3000"}/auth/reset-password/${rawToken}`
+    const frontendUrl = process.env["FRONTEND_URL"] || "http://localhost:5173"
+    const resetLink = `${frontendUrl}/reset-password/${rawToken}`
 
     try{
         await sendEmail(

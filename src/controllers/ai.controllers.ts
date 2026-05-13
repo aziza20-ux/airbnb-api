@@ -151,7 +151,7 @@ const chatPrompt = ChatPromptTemplate.fromMessages([
     ["placeholder", "{chat_history}"],
     ["human", "{input}"],
 ]);
-const chatChain = chatPrompt.pipe(llm);
+const chatChain = chatPrompt.pipe(llm).pipe(new StringOutputParser());
 
 const chainWithHistory = new RunnableWithMessageHistory({
     runnable:chatChain,

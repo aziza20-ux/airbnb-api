@@ -12,8 +12,7 @@ import {
   usersStats,
 } from "../../controllers/users.controller";
 
-import { register,login } from "../../controllers/auth.controller";
-import { requireAdmin } from "../../middlewares/auth.middleware";
+import { autheticate, requireAdmin } from "../../middlewares/auth.middleware";
 
 /**
  * @swagger
@@ -214,7 +213,7 @@ usersRoutes.post("/", asyncHandler("users.createUser", createUser));
  *       401:
  *         description: Unauthorized
  */
-usersRoutes.put("/:id", asyncHandler("users.updateUser", updateUser));
+usersRoutes.put("/:id", autheticate, asyncHandler("users.updateUser", updateUser));
 
 /**
  * @swagger

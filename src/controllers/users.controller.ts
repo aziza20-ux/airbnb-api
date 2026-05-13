@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import prisma from "../config/prisma";
 import { AppError } from "../utils/app-error";
 import { deleteCache, getCache, setCache } from "../config/cache";
+import type { AuthRequest } from "../middlewares/auth.middleware";
 
 type UsersStatsResponse = {
     totalUsers: number;
@@ -109,26 +110,54 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     res.status(201).json(newUser);
 };
 
-export const updateUser = async (req: Request, res: Response): Promise<void> => {
+export const updateUser = async (req: AuthRequest, res: Response): Promise<void> => {
     const id = String(req.params.id);
-    const existing = await prisma.user.findFirst({where:{id}});
+    const existing = await prisma.user.findUnique({ where: { id } });
 
     if (!existing) {
         throw new AppError(404, "user not found");
     }
 
-    const { name, email, username, role, avatar, bio } = req.body;
+    const isSelf = req.userId === id;
+    const isAdmin = req.role === "ADMIN";
 
-    if (name !== undefined) existing.name = name;
-    if (email !== undefined) existing.email = email;
-    if (username !== undefined) existing.username = username;
-    if (role !== undefined) existing.role = role;
-    if (avatar !== undefined) existing.avatar = avatar;
-    if (bio !== undefined) existing.bio = bio;
+    if (!isSelf && !isAdmin) {
+        throw new AppError(403, "forbidden access");
+    }
+
+    const { name, email, username, role, avatar, bio, phone } = req.body;
+    const data = {
+        ...(name !== undefined ? { name } : {}),
+        ...(email !== undefined ? { email } : {}),
+        ...(username !== undefined ? { username } : {}),
+        ...(phone !== undefined ? { phone } : {}),
+        ...(avatar !== undefined ? { avatar } : {}),
+        ...(bio !== undefined ? { bio } : {}),
+        ...(role !== undefined && isAdmin ? { role } : {}),
+    };
+
+    if (Object.keys(data).length === 0) {
+        throw new AppError(400, "No profile fields were provided");
+    }
+
+    let updatedUser;
+
+    try {
+        updatedUser = await prisma.user.update({
+            where: { id },
+            data,
+        });
+    } catch (error: any) {
+        if (error?.code === "P2002") {
+            throw new AppError(409, "Email or username already in use");
+        }
+
+        throw error;
+    }
 
     clearUsersStatsCache();
 
-    res.status(200).json(existing);
+    res.status(200).json(updatedUser);
 };
 
 export const deleteUser =  async (req: Request, res: Response): Promise<void> => {
