@@ -319,8 +319,6 @@ listingsRoutes.get("/search", asyncHandler("listings.searchListings", searchList
  *       404:
  *         description: Listing not found
  */
-listingsRoutes.get("/:id", asyncHandler("listings.getListingById", getListingById));
-
 /**
  * @swagger
  * /listings/stats:
@@ -336,6 +334,8 @@ listingsRoutes.get("/:id", asyncHandler("listings.getListingById", getListingByI
  *               $ref: '#/components/schemas/ListingStatsResponse'
  */
 listingsRoutes.get("/stats", asyncHandler("listings.listingStats", listingStats));
+
+listingsRoutes.get("/:id", asyncHandler("listings.getListingById", getListingById));
 
 /**
  * @swagger

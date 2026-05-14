@@ -32,8 +32,7 @@ async function main() {
       role: "ADMIN",
     },
   });
-  console.log("👨‍💼 Created admin user");
-  console.log("Admin credentials - Email: admin@airbnb.com, Password: Admin@123");
+
 
   // ─── Seed Users ───────────────────────────────────────────────────────────
 

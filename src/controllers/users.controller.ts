@@ -162,11 +162,62 @@ export const updateUser = async (req: AuthRequest, res: Response): Promise<void>
 
 export const deleteUser =  async (req: Request, res: Response): Promise<void> => {
     const id = String(req.params.id);
-    const deletedUser = await prisma.user.delete({where:{id}});
+    const existingUser = await prisma.user.findUnique({ where: { id } });
+
+    if (!existingUser) {
+        throw new AppError(404, "user not found");
+    }
+
+    const deletedUser = await prisma.$transaction(async (tx) => {
+        // Remove dependent records first to satisfy RESTRICT foreign keys.
+        await tx.booking.deleteMany({ where: { guestId: id } });
+        await tx.review.deleteMany({ where: { userId: id } });
+        await tx.listing.deleteMany({ where: { hostId: id } });
+
+        return tx.user.delete({ where: { id } });
+    });
+
+    clearUsersStatsCache();
+    deleteCache("listings:stats");
+
+    res.status(200).json(deletedUser);
+};
+
+export const disableUser = async (req: AuthRequest, res: Response): Promise<void> => {
+    const id = String(req.params.id);
+
+    if (!id) {
+        throw new AppError(400, "user id is required");
+    }
+
+    if (req.userId === id) {
+        throw new AppError(400, "You cannot disable your own account");
+    }
+
+    const existing = await prisma.user.findUnique({ where: { id } });
+    if (!existing) {
+        throw new AppError(404, "user not found");
+    }
+
+    const updatedUser = await prisma.user.update({
+        where: { id },
+        data: {
+            password: null,
+            resetToken: null,
+            resetTokenExpiry: null,
+        },
+    });
 
     clearUsersStatsCache();
 
-    res.status(200).json(deletedUser);
+    res.status(200).json({
+        message: "User disabled successfully",
+        user: {
+            id: updatedUser.id,
+            email: updatedUser.email,
+            role: updatedUser.role,
+        },
+    });
 };
 
 export const getListingsByHost = async (req: Request, res: Response): Promise<void> => {

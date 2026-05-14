@@ -7,6 +7,7 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  disableUser,
   getListingsByHost,
   getBookingsByGuest,
   usersStats,
@@ -83,7 +84,7 @@ const usersRoutes = Router();
  *         description: No token provided or token is invalid
  */
 
-usersRoutes.get("/", requireAdmin,asyncHandler("users.getAllUsers", getAllUsers));
+usersRoutes.get("/", autheticate, requireAdmin, asyncHandler("users.getAllUsers", getAllUsers));
 
 /**
  * @swagger
@@ -237,7 +238,8 @@ usersRoutes.put("/:id", autheticate, asyncHandler("users.updateUser", updateUser
  *       401:
  *         description: Unauthorized
  */
-usersRoutes.delete("/:id", requireAdmin,asyncHandler("users.deleteUser", deleteUser));
+usersRoutes.delete("/:id", autheticate, requireAdmin, asyncHandler("users.deleteUser", deleteUser));
+usersRoutes.patch("/:id/disable", autheticate, requireAdmin, asyncHandler("users.disableUser", disableUser));
 
 export default usersRoutes;
 
