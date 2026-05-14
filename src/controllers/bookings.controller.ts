@@ -5,6 +5,12 @@ import { AppError } from "../utils/app-error";
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
+const toUtcDateOnly = (value: Date): Date => {
+	const normalized = new Date(value);
+	normalized.setUTCHours(0, 0, 0, 0);
+	return normalized;
+};
+
 const parsePositiveInteger = (value: unknown, fieldName: string, defaultValue: number): number => {
 	if (value === undefined) {
 		return defaultValue;
@@ -117,7 +123,10 @@ export const createBooking = async (req: Request, res: Response): Promise<void> 
 		throw new AppError(400, "checkOut must be after checkIn");
 	}
 
-	if (checkInDate.getTime() <= Date.now()) {
+	const checkInDateOnly = toUtcDateOnly(checkInDate);
+	const todayUtcDateOnly = toUtcDateOnly(new Date());
+
+	if (checkInDateOnly <= todayUtcDateOnly) {
 		throw new AppError(400, "checkIn must be in the future");
 	}
 
@@ -173,9 +182,9 @@ export const deleteBooking = async (req: Request, res: Response): Promise<void> 
 
 export const updateBookingStatus = async (req: Request, res: Response): Promise<void> => {
 	const id = req.params.id;
-	const { status } = req.body;
+	const { status, cancelReason } = req.body;
 
-	if (typeof status !== "string" || !Object.values(BookingStatus).includes(status as typeof BookingStatus[keyof typeof BookingStatus])) {
+ 	if (typeof status !== "string" || !Object.values(BookingStatus).includes(status as typeof BookingStatus[keyof typeof BookingStatus])) {
 		throw new AppError(400, "Invalid booking status");
 	}
 
@@ -184,10 +193,18 @@ export const updateBookingStatus = async (req: Request, res: Response): Promise<
 		throw new AppError(404, "Booking not found");
 	}
 
+	// When cancelling, require a non-empty reason to be provided
+	if (status === BookingStatus.CANCELLED) {
+		if (typeof cancelReason !== "string" || cancelReason.trim() === "") {
+			throw new AppError(400, "cancelReason is required when cancelling a booking");
+		}
+	}
+
 	const updatedBooking = await prisma.booking.update({
 		where: { id: String(id) },
 		data: {
 			status: status as typeof BookingStatus[keyof typeof BookingStatus],
+			...(status === BookingStatus.CANCELLED ? { cancelReason: String(cancelReason) } : {}),
 		},
 	});
 

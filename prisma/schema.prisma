@@ -26,11 +26,12 @@ model User {
   password         String?
   avatarPublicId   String?
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now()) @updatedAt
-  listings  Listing[]
-  bookings  Booking[]
-  reviews   Review[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @default(now()) @updatedAt
+  listings       Listing[]
+  bookings       Booking[]
+  reviews        Review[]
+  hostRequests   HostRequest[]
 
   @@index([name])
   @@index([role])
@@ -47,6 +48,7 @@ model Booking {
   guestId    String
   listing    Listing       @relation(fields: [listingId], references: [id], onDelete: Cascade)
   listingId  String
+  cancelReason String?
 
   @@index([guestId])
   @@index([listingId])
@@ -118,4 +120,22 @@ model Review {
 
   @@index([userId])
   @@index([listingId])
+}
+
+enum HostRequestStatus {
+  PENDING
+  APPROVED
+  DENIED
+}
+
+model HostRequest {
+  id        String              @id @default(uuid())
+  userId    String
+  status    HostRequestStatus   @default(PENDING)
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime            @default(now())
+  reviewedAt DateTime?
+
+  @@index([userId])
+  @@index([status])
 }
