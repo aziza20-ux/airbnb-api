@@ -13,13 +13,13 @@ const JWT_EXPIRES_IN: SignOptions["expiresIn"] =
     (process.env.JWT_EXPIRES_IN as SignOptions["expiresIn"]) ?? "1d";
 export const register = async (req:Request,res:Response):Promise<void> =>{
     const {name,email,username,phone,password,role}=req.body
+    const normalizedRole: "GUEST" | "HOST" = typeof role === "string" && role.toUpperCase() === "HOST" ? "HOST" : "GUEST"
     if(
         !name
         || !email
         || !username
         || !phone
         || !password
-        || !role
     ){
         res.status(400).json({error:"one of the required fields is missing"})
         return;
@@ -49,7 +49,7 @@ export const register = async (req:Request,res:Response):Promise<void> =>{
                 username,
                 phone,
                 password: hashedpassword,
-                role  
+                role: normalizedRole
             }
         })
 
@@ -60,7 +60,7 @@ export const register = async (req:Request,res:Response):Promise<void> =>{
             await sendEmail(
                 email,
                 "Welcome to Airbnb",
-                welcomeEmail(name,role)
+                welcomeEmail(name,normalizedRole)
             );
         }catch(error){
             console.log("Email send error:", error)

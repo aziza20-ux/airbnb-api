@@ -2,7 +2,7 @@
 // In a real app you might use a templating engine like Handlebars or MJML
 // for more complex designs
 
-export function welcomeEmail(name: string,role:string): string {
+export function welcomeEmail(name: string, role: string = "GUEST"): string {
     if (role=='GUEST'){
         return `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
