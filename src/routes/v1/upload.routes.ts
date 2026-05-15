@@ -74,7 +74,7 @@ uploadRoutes.delete("/:id/avatar", autheticate, asyncHandler("upload.deleteAvata
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: The listing ID
  *     requestBody:
  *       required: true
